@@ -1,0 +1,22 @@
+services:
+  web-dev:
+    container_name: web_dev
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: development
+    ports:
+      - '3000:3000'
+    volumes:
+      # bind mount (for hot reloading)
+      - .:/usr/app
+      # anonymous volume for node_modules
+      - /usr/app/node_modules
+  web-prod:
+    container_name: web_prod
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    ports:
+      - '8080:80'
