@@ -7,9 +7,11 @@ export interface EquationEditorProps {
   /** Marked model value (may include {{b}}/{{i}}/align markers). */
   value: string;
   /** Receives marker-free display text from the textarea; parent maps back to the model. */
-  onChange: (displayValue: string) => void;
+  onChange: (displayValue: string, displayCaret?: number) => void;
   textareaRef: RefObject<HTMLTextAreaElement | null>;
   onCursorChange?: () => void;
+  /** Fired on pointer down so the parent can resume selection sync after toolbar actions. */
+  onUserSelectionIntent?: () => void;
   onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
   onCopy?: ClipboardEventHandler<HTMLTextAreaElement>;
   onPaste?: ClipboardEventHandler<HTMLTextAreaElement>;

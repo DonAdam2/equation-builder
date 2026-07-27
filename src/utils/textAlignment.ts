@@ -153,13 +153,15 @@ export const applyAlignmentAtCursor = (
   const range = findBlockRange(normalized, cursor);
   const body = normalized.slice(range.bodyStart, range.end);
   const marker = formatAlignMarker(align);
-  const alignedBlock = body.length ? `${marker}\n${body}` : marker;
+  // Always keep a content line after the marker so later inline formats
+  // (bold/italic/…) are not concatenated onto `{{align:…}}` (same-line hang).
+  const alignedBlock = `${marker}\n${body}`;
 
   const before = normalized.slice(0, range.start);
   const after = normalized.slice(range.end);
   const nextValue = `${before}${alignedBlock}${after}`.replace(/\n{3,}/g, '\n\n');
 
-  const caret = before.length + marker.length + (body.length ? 1 : 0);
+  const caret = before.length + marker.length + 1;
   return {
     nextValue,
     selectionStart: caret,

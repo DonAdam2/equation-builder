@@ -11,6 +11,7 @@ const EquationEditor = ({
   onChange,
   textareaRef,
   onCursorChange,
+  onUserSelectionIntent,
   onKeyDown,
   onCopy,
   onPaste,
@@ -67,7 +68,10 @@ const EquationEditor = ({
             ref={textareaRef}
             className="equation-editor-input"
             value={displayValue}
-            onChange={(event) => onChange(event.target.value)}
+            onChange={(event) =>
+              onChange(event.target.value, event.target.selectionStart ?? undefined)
+            }
+            onMouseDown={onUserSelectionIntent}
             onSelect={onCursorChange}
             onKeyUp={onCursorChange}
             onKeyDown={onKeyDown}

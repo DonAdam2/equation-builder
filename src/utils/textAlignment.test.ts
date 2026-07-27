@@ -32,4 +32,13 @@ describe('textAlignment', () => {
   it('strips alignment markers for converters', () => {
     expect(stripAlignMarkers('{{align:right}}\nλ = 4')).toBe('λ = 4');
   });
+
+  it('keeps a content line after align so bold is not glued to the marker', () => {
+    const result = applyAlignmentAtCursor('', 0, 'center');
+    expect(result.nextValue).toBe('{{align:center}}\n');
+    expect(result.selectionStart).toBe('{{align:center}}\n'.length);
+
+    const boldAtCaret = `${result.nextValue.slice(0, result.selectionStart)}{{b}}{{/b}}${result.nextValue.slice(result.selectionEnd)}`;
+    expect(boldAtCaret).toBe('{{align:center}}\n{{b}}{{/b}}');
+  });
 });

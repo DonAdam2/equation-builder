@@ -96,6 +96,95 @@ export const isInlineFormatActive = (
 };
 
 /**
+ * Drop leading/trailing newlines from a selection so bold/italic (etc.) wrap
+ * only the paragraph text — not the paragraph break. Selecting a line in a
+ * textarea often includes the trailing `\n`, which would otherwise move the
+ * caret onto the next row after formatting.
+ */
+export const trimInlineFormatSelection = (
+  value: string,
+  selectionStart: number,
+  selectionEnd: number
+): { start: number; end: number } => {
+  let start = Math.max(0, Math.min(selectionStart, selectionEnd, value.length));
+  let end = Math.max(selectionStart, selectionEnd);
+  end = Math.min(end, value.length);
+
+  while (start < end && (value[start] === '\n' || value[start] === '\r')) {
+    start += 1;
+  }
+  while (end > start && (value[end - 1] === '\n' || value[end - 1] === '\r')) {
+    end -= 1;
+  }
+
+  return { start, end };
+};
+
+/**
+ * Collapsed caret inside an active format: leave existing styled text alone and
+ * place the caret in an unformatted gap (Word-like “turn off for new typing”).
+ * - at end → move past the closing marker
+ * - at start → move before the opening marker
+ * - in the middle → split into two styled runs with the caret between them
+ */
+const exitInlineFormatAtCaret = (
+  value: string,
+  caret: number,
+  open: string,
+  close: string
+): TextSelectionResult | null => {
+  const before = value.slice(0, caret);
+  const openAt = before.lastIndexOf(open);
+  const closeAt = value.indexOf(close, caret);
+  if (openAt < 0 || closeAt < 0) {
+    return null;
+  }
+
+  const innerStart = openAt + open.length;
+  const left = value.slice(innerStart, caret);
+  const right = value.slice(caret, closeAt);
+  const afterClose = value.slice(closeAt + close.length);
+  const beforeOpen = value.slice(0, openAt);
+
+  if (!left && !right) {
+    // Empty pair — remove it and leave the caret where it was.
+    return {
+      nextValue: `${beforeOpen}${afterClose}`,
+      selectionStart: openAt,
+      selectionEnd: openAt,
+    };
+  }
+
+  if (!right) {
+    // End of run: keep styling, continue typing unformatted after it.
+    const caretAfter = openAt + open.length + left.length + close.length;
+    return {
+      nextValue: value,
+      selectionStart: caretAfter,
+      selectionEnd: caretAfter,
+    };
+  }
+
+  if (!left) {
+    // Start of run: keep styling, type unformatted before it.
+    return {
+      nextValue: value,
+      selectionStart: openAt,
+      selectionEnd: openAt,
+    };
+  }
+
+  // Middle of run: split so previous/next styled text both remain.
+  const nextValue = `${beforeOpen}${open}${left}${close}${open}${right}${close}${afterClose}`;
+  const caretAfter = openAt + open.length + left.length + close.length;
+  return {
+    nextValue,
+    selectionStart: caretAfter,
+    selectionEnd: caretAfter,
+  };
+};
+
+/**
  * Toggles an inline format around the current selection.
  * Empty selection inserts an empty pair and places the caret inside.
  */
@@ -107,20 +196,29 @@ export const toggleInlineFormat = (
 ): TextSelectionResult => {
   const open = openTag(format);
   const close = closeTag(format);
+  const { start, end } = trimInlineFormatSelection(value, selectionStart, selectionEnd);
 
-  const unwrapped = unwrapExactSelection(value, selectionStart, selectionEnd, open, close);
+  const unwrapped = unwrapExactSelection(value, start, end, open, close);
   if (unwrapped) {
     return unwrapped;
   }
 
-  if (
-    selectionStart !== selectionEnd &&
-    isInlineFormatActive(value, selectionStart, selectionEnd, format)
-  ) {
-    // Selection inside markers — expand to outer markers and unwrap.
-    const before = value.slice(0, selectionStart);
+  if (isInlineFormatActive(value, start, end, format)) {
+    // Collapsed caret: exit the format for new typing — never strip existing marks.
+    if (start === end) {
+      return (
+        exitInlineFormatAtCaret(value, start, open, close) ?? {
+          nextValue: value,
+          selectionStart: start,
+          selectionEnd: end,
+        }
+      );
+    }
+
+    // Non-empty selection inside a format — unwrap that run.
+    const before = value.slice(0, start);
     const openAt = before.lastIndexOf(open);
-    const closeAt = value.indexOf(close, selectionEnd);
+    const closeAt = value.indexOf(close, end);
     if (openAt >= 0 && closeAt >= 0) {
       const inner = value.slice(openAt + open.length, closeAt);
       const nextValue = `${value.slice(0, openAt)}${inner}${value.slice(closeAt + close.length)}`;
@@ -132,7 +230,18 @@ export const toggleInlineFormat = (
     }
   }
 
-  return wrapSelection(value, selectionStart, selectionEnd, open, close);
+  const wrapped = wrapSelection(value, start, end, open, close);
+  // After formatting a range, collapse to the end of the styled text so Enter
+  // inserts below that paragraph instead of replacing the selection / jumping
+  // to the following row.
+  if (start !== end) {
+    return {
+      nextValue: wrapped.nextValue,
+      selectionStart: wrapped.selectionEnd,
+      selectionEnd: wrapped.selectionEnd,
+    };
+  }
+  return wrapped;
 };
 
 const getLineBounds = (
@@ -312,6 +421,38 @@ export const continueListOnEnter = (
 const escapeHtmlText = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+const INLINE_OPEN_AT_RE = /^\{\{(b|i|u|sup|sub)\}\}/;
+const INLINE_CLOSE_AT_RE = /^\{\{\/(b|i|u|sup|sub)\}\}/;
+const ALIGN_MARKER_AT_RE = /^\{\{align:(?:left|center|right)\}\}/i;
+const ANY_BRACED_MARKER_AT_RE = /^\{\{[^}]*\}\}/;
+
+/**
+ * Advances past a `{{...}}` that is not an inline open tag.
+ * Orphan closes / align markers are skipped; anything else is emitted as literal text.
+ * Always moves forward so parsers cannot spin on unknown markers.
+ */
+const consumeNonOpenMarker = (
+  input: string,
+  index: number
+): { end: number; literal: string | null } => {
+  const closeMatch = input.slice(index).match(INLINE_CLOSE_AT_RE);
+  if (closeMatch) {
+    return { end: index + closeMatch[0].length, literal: null };
+  }
+
+  const alignMatch = input.slice(index).match(ALIGN_MARKER_AT_RE);
+  if (alignMatch) {
+    return { end: index + alignMatch[0].length, literal: null };
+  }
+
+  const braced = input.slice(index).match(ANY_BRACED_MARKER_AT_RE);
+  if (braced) {
+    return { end: index + braced[0].length, literal: braced[0] };
+  }
+
+  return { end: index + 1, literal: input[index] ?? '' };
+};
+
 /**
  * Converts inline format markers into HTML for Word plain-text paragraphs.
  */
@@ -321,7 +462,7 @@ export const richTextToHtml = (text: string): string => {
     let index = 0;
 
     while (index < input.length) {
-      const openMatch = input.slice(index).match(/^\{\{(b|i|u|sup|sub)\}\}/);
+      const openMatch = input.slice(index).match(INLINE_OPEN_AT_RE);
       if (openMatch) {
         const tag = openMatch[1];
         const contentStart = index + openMatch[0].length;
@@ -346,8 +487,16 @@ export const richTextToHtml = (text: string): string => {
       const plain = nextMarker === -1 ? input.slice(index) : input.slice(index, nextMarker);
       if (plain) {
         result += escapeHtmlText(plain);
+        index = nextMarker === -1 ? input.length : nextMarker;
+        continue;
       }
-      index = nextMarker === -1 ? input.length : nextMarker;
+
+      // Sitting on `{{` that isn't a valid inline open — never stall here.
+      const consumed = consumeNonOpenMarker(input, index);
+      if (consumed.literal) {
+        result += escapeHtmlText(consumed.literal);
+      }
+      index = consumed.end;
     }
 
     return result;
@@ -395,7 +544,7 @@ export const richTextToLatex = (text: string, escapeText: (value: string) => str
     let index = 0;
 
     while (index < input.length) {
-      const openMatch = input.slice(index).match(/^\{\{(b|i|u|sup|sub)\}\}/);
+      const openMatch = input.slice(index).match(INLINE_OPEN_AT_RE);
       if (openMatch) {
         const tag = openMatch[1];
         const contentStart = index + openMatch[0].length;
@@ -436,8 +585,16 @@ export const richTextToLatex = (text: string, escapeText: (value: string) => str
       const plain = nextMarker === -1 ? input.slice(index) : input.slice(index, nextMarker);
       if (plain) {
         result += wrapPlainLatex(plain, escapeText, style);
+        index = nextMarker === -1 ? input.length : nextMarker;
+        continue;
       }
-      index = nextMarker === -1 ? input.length : nextMarker;
+
+      // Sitting on `{{` that isn't a valid inline open — never stall here.
+      const consumed = consumeNonOpenMarker(input, index);
+      if (consumed.literal) {
+        result += wrapPlainLatex(consumed.literal, escapeText, style);
+      }
+      index = consumed.end;
     }
 
     return result;

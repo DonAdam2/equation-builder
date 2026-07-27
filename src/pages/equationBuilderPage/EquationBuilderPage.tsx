@@ -36,6 +36,7 @@ const EquationBuilderPage = () => {
     activeInlineFormats,
     activeListFormat,
     handleCursorChange,
+    handleUserSelectionIntent,
     handleKeyDown,
     handlePaste,
     undo,
@@ -112,6 +113,7 @@ const EquationBuilderPage = () => {
             onChange={setValue}
             textareaRef={textareaRef}
             onCursorChange={handleCursorChange}
+            onUserSelectionIntent={handleUserSelectionIntent}
             onKeyDown={handleKeyDown}
             onCopy={handleEditorCopy}
             onPaste={handlePaste}

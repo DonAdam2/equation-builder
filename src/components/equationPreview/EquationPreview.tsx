@@ -25,12 +25,17 @@ const EquationPreview = ({ editorText }: EquationPreviewProps) => {
         ) : errorMessage ? (
           <p className="equation-preview-error">{errorMessage}</p>
         ) : (
-          <div className="equation-preview-blocks" data-testid="equation-preview-math">
+          <div
+            className="equation-preview-blocks"
+            data-testid="equation-preview-math"
+            data-preview-rows={blocks.length}
+          >
             {blocks.map((block, index) => (
               <div
                 key={`${block.align}-${index}`}
                 className={`equation-preview-block is-${block.align}`}
                 data-align={block.align}
+                data-preview-row={index + 1}
                 dangerouslySetInnerHTML={{ __html: block.katexMarkup }}
               />
             ))}

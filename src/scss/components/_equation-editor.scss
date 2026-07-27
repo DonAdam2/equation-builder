@@ -70,6 +70,16 @@
   u {
     text-decoration: underline;
   }
+
+  // Superscript/subscript render at 75% (normalize), but the transparent
+  // textarea glyph behind them keeps the full monospace advance — the caret
+  // drifts right and looks like extra space after the run. Letter-spacing
+  // pads each 0.75-sized char back to one full base cell (0.25 base cell =
+  // 1ch / 3 in the reduced font) so mirror and textarea stay aligned.
+  sup,
+  sub {
+    letter-spacing: calc(1ch / 3);
+  }
 }
 
 .equation-editor-input {

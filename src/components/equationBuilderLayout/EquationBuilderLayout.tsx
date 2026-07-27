@@ -18,9 +18,9 @@ const EquationBuilderLayout = ({
       </header>
 
       <section className="equation-builder-panel equation-builder-editor-panel">{editor}</section>
+      <section className="equation-builder-panel equation-builder-pills-panel">{pills}</section>
       <section className="equation-builder-panel equation-builder-preview-panel">{preview}</section>
       <section className="equation-builder-panel equation-builder-toolbar-panel">{toolbar}</section>
-      <section className="equation-builder-panel equation-builder-pills-panel">{pills}</section>
       <section className="equation-builder-panel equation-builder-table-panel">{table}</section>
     </div>
   );

@@ -1,4 +1,12 @@
-import { ClipboardEvent, KeyboardEvent, RefObject, useCallback, useState } from 'react';
+import {
+  ClipboardEvent,
+  KeyboardEvent,
+  RefObject,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { toast } from 'react-toastify';
 
@@ -12,6 +20,7 @@ import {
   buildRichTextDisplay,
   displayCaretToModel,
   modelCaretToDisplay,
+  rebalanceInlineFormatsAcrossNewlines,
 } from '@/utils/richTextDisplay';
 import { applyAlignmentAtCursor, getAlignmentAtCursor, TextAlign } from '@/utils/textAlignment';
 import {
@@ -44,6 +53,11 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
   const [activeAlign, setActiveAlign] = useState<TextAlign>('left');
   const [activeInlineFormats, setActiveInlineFormats] = useState<InlineFormat[]>([]);
   const [activeListFormat, setActiveListFormat] = useState<ListFormat | null>(null);
+  // After toolbar formatting, the controlled textarea often keeps the old range
+  // (markers are hidden so the display string is unchanged). Ignore those
+  // onSelect/onClick syncs until the user interacts with the textarea again.
+  const suppressSelectionSyncRef = useRef(false);
+  const pendingDisplaySelectionRef = useRef<{ start: number; end: number } | null>(null);
 
   const syncFormatState = useCallback((nextValue: string, start: number, end: number) => {
     setActiveAlign(getAlignmentAtCursor(nextValue, start));
@@ -80,7 +94,42 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
     []
   );
 
+  const commitModelSelection = useCallback(
+    (selectionStart: number, selectionEnd: number, modelValue: string) => {
+      suppressSelectionSyncRef.current = true;
+      selectionRef.current = { start: selectionStart, end: selectionEnd };
+      syncFormatState(modelValue, selectionStart, selectionEnd);
+
+      const map = buildRichTextDisplay(modelValue);
+      const displayStart = modelCaretToDisplay(map, selectionStart);
+      const displayEnd = modelCaretToDisplay(map, selectionEnd);
+      pendingDisplaySelectionRef.current = { start: displayStart, end: displayEnd };
+
+      const editor = textareaRef.current;
+      if (editor) {
+        editor.focus();
+        editor.setSelectionRange(displayStart, displayEnd);
+      }
+    },
+    [selectionRef, syncFormatState, textareaRef]
+  );
+
+  useLayoutEffect(() => {
+    const pending = pendingDisplaySelectionRef.current;
+    const editor = textareaRef.current;
+    if (!pending || !editor) {
+      return;
+    }
+    // Re-assert after React commits — controlled textareas restore stale ranges
+    // when the visible value string does not change (hidden markers).
+    editor.setSelectionRange(pending.start, pending.end);
+  }, [value, textareaRef]);
+
   const syncSelectionFromElement = useCallback(() => {
+    if (suppressSelectionSyncRef.current) {
+      return;
+    }
+
     const element = textareaRef.current;
     if (!element) {
       return;
@@ -93,37 +142,47 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
       element.selectionEnd ?? 0
     );
     selectionRef.current = mapped;
+    pendingDisplaySelectionRef.current = null;
     syncFormatState(modelValue, mapped.start, mapped.end);
   }, [displaySelectionToModel, getValue, selectionRef, syncFormatState, textareaRef]);
 
+  /** Call when the user interacts with the textarea so selection sync resumes. */
+  const handleUserSelectionIntent = useCallback(() => {
+    suppressSelectionSyncRef.current = false;
+    pendingDisplaySelectionRef.current = null;
+  }, []);
+
   const restoreSnapshotSelection = useCallback(
     (selectionStart: number, selectionEnd: number, modelValue = getValue()) => {
+      commitModelSelection(selectionStart, selectionEnd, modelValue);
       requestAnimationFrame(() => {
         const editor = textareaRef.current;
-        if (!editor) {
+        const pending = pendingDisplaySelectionRef.current;
+        if (!editor || !pending) {
           return;
         }
-
-        const map = buildRichTextDisplay(modelValue);
-        const displayStart = modelCaretToDisplay(map, selectionStart);
-        const displayEnd = modelCaretToDisplay(map, selectionEnd);
-
         editor.focus();
-        editor.setSelectionRange(displayStart, displayEnd);
-        selectionRef.current = {
-          start: selectionStart,
-          end: selectionEnd,
-        };
-        syncFormatState(modelValue, selectionStart, selectionEnd);
+        editor.setSelectionRange(pending.start, pending.end);
       });
     },
-    [getValue, selectionRef, syncFormatState, textareaRef]
+    [commitModelSelection, getValue, textareaRef]
   );
 
   /** Textarea onChange provides marker-free display text; map back onto the model. */
   const handleChange = useCallback(
-    (nextDisplay: string) => {
-      const { nextModel, displayCaret } = applyDisplayEdit(getValue(), nextDisplay);
+    (nextDisplay: string, preferredDisplayCaret?: number) => {
+      // Typing is a real user edit — resume selection sync for arrow keys, etc.
+      suppressSelectionSyncRef.current = false;
+      pendingDisplaySelectionRef.current = null;
+
+      const stored = selectionRef.current;
+      const preferredModelCaret = stored.start === stored.end ? stored.start : undefined;
+      const { nextModel, displayCaret } = applyDisplayEdit(
+        getValue(),
+        nextDisplay,
+        preferredDisplayCaret,
+        preferredModelCaret
+      );
       applyTypingChange(nextModel);
 
       const map = buildRichTextDisplay(nextModel);
@@ -202,6 +261,10 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
+      // Keyboard caret moves must update selectionRef again after a toolbar action.
+      suppressSelectionSyncRef.current = false;
+      pendingDisplaySelectionRef.current = null;
+
       if (
         event.key === 'Enter' &&
         !event.metaKey &&
@@ -215,12 +278,13 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
         const result = continueListOnEnter(modelValue, start, end);
         if (result) {
           event.preventDefault();
+          const nextValue = rebalanceInlineFormatsAcrossNewlines(result.nextValue);
           applyImmediateChange({
-            value: result.nextValue,
+            value: nextValue,
             selectionStart: result.selectionStart,
             selectionEnd: result.selectionEnd,
           });
-          restoreSnapshotSelection(result.selectionStart, result.selectionEnd, result.nextValue);
+          restoreSnapshotSelection(result.selectionStart, result.selectionEnd, nextValue);
         }
         return;
       }
@@ -339,9 +403,10 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
   const applyInlineFormat = useCallback(
     (format: InlineFormat) => {
       const modelValue = getValue();
-      const { displayStart, displayEnd } = readDisplaySelection();
-      const { start, end } = displaySelectionToModel(modelValue, displayStart, displayEnd);
-      selectionRef.current = { start, end };
+      // Trust selectionRef, not the textarea. After formatting, the controlled
+      // textarea often still reports the whole styled run as selected even though
+      // the model caret was collapsed — reading that range would unwrap.
+      const { start, end } = selectionRef.current;
 
       const { nextValue, selectionStart, selectionEnd } = toggleInlineFormat(
         modelValue,
@@ -355,16 +420,9 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
         selectionStart,
         selectionEnd,
       });
-      restoreSnapshotSelection(selectionStart, selectionEnd, nextValue);
+      commitModelSelection(selectionStart, selectionEnd, nextValue);
     },
-    [
-      applyImmediateChange,
-      displaySelectionToModel,
-      getValue,
-      readDisplaySelection,
-      restoreSnapshotSelection,
-      selectionRef,
-    ]
+    [applyImmediateChange, commitModelSelection, getValue, selectionRef]
   );
 
   const applyListFormat = useCallback(
@@ -411,6 +469,7 @@ const useEquationInsertion = ({ textareaRef }: UseEquationInsertionParams) => {
     activeListFormat,
     focusEditor,
     handleCursorChange,
+    handleUserSelectionIntent,
     handleKeyDown,
     handlePaste,
     syncSelectionFromElement,

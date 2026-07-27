@@ -2,6 +2,7 @@ import {
   continueListOnEnter,
   isInlineFormatActive,
   isListFormatActive,
+  richTextToHtml,
   richTextToLatex,
   toggleInlineFormat,
   toggleListFormat,
@@ -13,17 +14,89 @@ describe('textFormatting', () => {
   it('wraps and unwraps bold around a selection', () => {
     const wrapped = toggleInlineFormat('hello world', 6, 11, 'bold');
     expect(wrapped.nextValue).toBe('hello {{b}}world{{/b}}');
+    // Toolbar formatting collapses to the end of the styled run.
+    expect(wrapped.selectionStart).toBe(wrapped.selectionEnd);
     expect(
       isInlineFormatActive(wrapped.nextValue, wrapped.selectionStart, wrapped.selectionEnd, 'bold')
     ).toBe(true);
 
-    const unwrapped = toggleInlineFormat(
+    // Second click at the end exits bold for new typing — keeps existing bold text.
+    const exited = toggleInlineFormat(
       wrapped.nextValue,
       wrapped.selectionStart,
       wrapped.selectionEnd,
       'bold'
     );
+    expect(exited.nextValue).toBe('hello {{b}}world{{/b}}');
+    expect(
+      isInlineFormatActive(exited.nextValue, exited.selectionStart, exited.selectionEnd, 'bold')
+    ).toBe(false);
+
+    // Selecting the bold run and toggling removes the markers.
+    const innerStart = exited.nextValue.indexOf('world');
+    const unwrapped = toggleInlineFormat(
+      exited.nextValue,
+      innerStart,
+      innerStart + 'world'.length,
+      'bold'
+    );
     expect(unwrapped.nextValue).toBe('hello world');
+  });
+
+  it('keeps superscript text when turning superscript off at the end of the run', () => {
+    const base = 'y = x2';
+    const wrapped = toggleInlineFormat(base, base.indexOf('2'), base.indexOf('2') + 1, 'superscript');
+    expect(wrapped.nextValue).toBe('y = x{{sup}}2{{/sup}}');
+    expect(
+      isInlineFormatActive(
+        wrapped.nextValue,
+        wrapped.selectionStart,
+        wrapped.selectionEnd,
+        'superscript'
+      )
+    ).toBe(true);
+
+    const exited = toggleInlineFormat(
+      wrapped.nextValue,
+      wrapped.selectionStart,
+      wrapped.selectionEnd,
+      'superscript'
+    );
+    expect(exited.nextValue).toBe('y = x{{sup}}2{{/sup}}');
+    expect(
+      isInlineFormatActive(
+        exited.nextValue,
+        exited.selectionStart,
+        exited.selectionEnd,
+        'superscript'
+      )
+    ).toBe(false);
+  });
+
+  it('exits superscript at end even if the styled run is still reported as selected', () => {
+    // Simulates: format applied (caret collapsed in selectionRef), but textarea
+    // still reports the previous range covering the whole run.
+    const value = 'asdf asd{{sup}}fasdf{{/sup}}';
+    const innerStart = value.indexOf('fasdf');
+    const innerEnd = innerStart + 'fasdf'.length;
+
+    // If we used the stale range, toggle would unwrap. Collapsed end must exit.
+    const atEnd = toggleInlineFormat(value, innerEnd, innerEnd, 'superscript');
+    expect(atEnd.nextValue).toBe(value);
+    expect(isInlineFormatActive(atEnd.nextValue, atEnd.selectionStart, atEnd.selectionEnd, 'superscript')).toBe(
+      false
+    );
+
+    // Explicit selection of the run still removes the format.
+    const removed = toggleInlineFormat(value, innerStart, innerEnd, 'superscript');
+    expect(removed.nextValue).toBe('asdf asdfasdf');
+  });
+
+  it('does not wrap a trailing paragraph break when bolding a line selection', () => {
+    const wrapped = toggleInlineFormat('asdf\nadsf\nasdf', 0, 'asdf\n'.length, 'bold');
+    expect(wrapped.nextValue).toBe('{{b}}asdf{{/b}}\nadsf\nasdf');
+    expect(wrapped.selectionStart).toBe('{{b}}asdf'.length);
+    expect(wrapped.selectionEnd).toBe('{{b}}asdf'.length);
   });
 
   it('toggles bullet and numbered lists on selected lines', () => {
@@ -90,5 +163,13 @@ describe('textFormatting', () => {
     const latex = richTextToLatex('x{{sup}}2{{/sup}} y{{sub}}i{{/sub}}', escape);
     expect(latex).toContain('^{\\text{2}}');
     expect(latex).toContain('_{\\text{i}}');
+  });
+
+  it('does not hang on align markers or orphan closes mixed with bold', () => {
+    const mixed = '{{align:center}}{{b}}hello{{/b}}';
+    expect(richTextToHtml(mixed)).toBe('<b>hello</b>');
+    expect(richTextToLatex(mixed, escape)).toContain('\\textbf{hello}');
+    expect(richTextToHtml('{{/b}}')).toBe('');
+    expect(richTextToLatex('{{/b}}', escape)).toBe('');
   });
 });
