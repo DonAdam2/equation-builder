@@ -1,15 +1,6 @@
 import { useMemo } from 'react';
 
-import katex from 'katex';
-
-import { AlignedBlock, parseAlignedBlocks, TextAlign } from '@/utils/textAlignment';
-import { editorTextToLatex } from '@/utils/textToLatex';
-
-export interface PreviewBlock {
-  align: TextAlign;
-  latex: string;
-  katexMarkup: string;
-}
+import { buildPreviewBlocks, PreviewBlock } from '@/utils/equationPreview';
 
 interface UseEquationPreviewResult {
   latex: string;
@@ -19,53 +10,24 @@ interface UseEquationPreviewResult {
   errorMessage: string | null;
 }
 
-const renderKatexMarkup = (latex: string): string =>
-  katex.renderToString(latex, {
-    throwOnError: false,
-    displayMode: true,
-    output: 'html',
-    strict: 'ignore',
-  });
-
-const toPreviewBlocks = (alignedBlocks: AlignedBlock[]): PreviewBlock[] =>
-  alignedBlocks
-    .map((block) => {
-      const latex = editorTextToLatex(block.text);
-      if (!latex) {
-        return null;
-      }
-      return {
-        align: block.align,
-        latex,
-        katexMarkup: renderKatexMarkup(latex),
-      };
-    })
-    .filter((block): block is PreviewBlock => Boolean(block));
-
 const useEquationPreview = (editorText: string): UseEquationPreviewResult => {
   return useMemo(() => {
-    const alignedBlocks = parseAlignedBlocks(editorText);
-    const blocks = toPreviewBlocks(
-      alignedBlocks.length ? alignedBlocks : [{ align: 'left', text: editorText }]
-    );
-
-    if (!blocks.length) {
-      return {
-        latex: '',
-        katexMarkup: '',
-        blocks: [],
-        hasContent: false,
-        errorMessage: null,
-      };
-    }
-
     try {
-      const latex = blocks.map((block) => block.latex).join(' \\\\[0.75em] ');
-      const katexMarkup = blocks.map((block) => block.katexMarkup).join('');
+      const blocks = buildPreviewBlocks(editorText);
+
+      if (!blocks.length) {
+        return {
+          latex: '',
+          katexMarkup: '',
+          blocks: [],
+          hasContent: false,
+          errorMessage: null,
+        };
+      }
 
       return {
-        latex,
-        katexMarkup,
+        latex: blocks.map((block) => block.latex).join(' \\\\[0.75em] '),
+        katexMarkup: blocks.map((block) => block.katexMarkup).join(''),
         blocks,
         hasContent: true,
         errorMessage: null,
@@ -82,4 +44,5 @@ const useEquationPreview = (editorText: string): UseEquationPreviewResult => {
   }, [editorText]);
 };
 
+export type { PreviewBlock };
 export default useEquationPreview;

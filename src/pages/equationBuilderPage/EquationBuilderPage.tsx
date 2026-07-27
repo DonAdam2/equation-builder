@@ -16,7 +16,7 @@ import { Equation } from '@/models/Equation';
 
 import { equations } from '@/data/equations';
 
-import { downloadTextAsPdf } from '@/utils/downloadPdf';
+import { downloadWordStyleAsPdf } from '@/utils/downloadPdf';
 import { TextAlign } from '@/utils/textAlignment';
 import { copyWordStyleFormula, writeWordStyleToClipboardEvent } from '@/utils/wordClipboard';
 
@@ -94,8 +94,13 @@ const EquationBuilderPage = () => {
   );
 
   const handleDownloadPdf = useCallback(() => {
-    downloadTextAsPdf(value, 'ai-formula-builder.pdf');
-    setStatusMessage('PDF downloaded with a white background.');
+    void downloadWordStyleAsPdf(value, 'ai-formula-builder.pdf')
+      .then(() => {
+        setStatusMessage('Word-style PDF downloaded.');
+      })
+      .catch(() => {
+        setStatusMessage('Unable to download PDF. Please try again.');
+      });
   }, [value]);
 
   return (

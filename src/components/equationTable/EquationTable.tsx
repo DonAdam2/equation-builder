@@ -102,6 +102,7 @@ const EquationTable = ({ equations, onEquationSelect }: EquationTableProps) => {
             tableClassName: 'equation-datatable-table',
           }}
           noDataToDisplayMessage="No equations match your search."
+          columnOrdering={{ enabled: false }}
         />
       </div>
     </section>
