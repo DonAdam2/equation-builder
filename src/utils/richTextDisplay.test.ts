@@ -55,6 +55,17 @@ describe('richTextDisplay', () => {
   it('cleans empty and orphan markers', () => {
     expect(cleanupRichTextMarkers('A{{b}}{{/b}}C')).toBe('AC');
     expect(cleanupRichTextMarkers('A{{/b}}C')).toBe('AC');
+    expect(cleanupRichTextMarkers('{{b}}')).toBe('');
+    expect(cleanupRichTextMarkers('A{{b}}C')).toBe('AC');
+    expect(cleanupRichTextMarkers('{{b}}x{{/b}}{{b}}y')).toBe('{{b}}x{{/b}}y');
+  });
+
+  it('select-all delete drops the surviving open marker instead of showing it raw', () => {
+    // Bold first lines, plain rest — the state from the reported bug.
+    const model = '{{b}}asdf{{/b}}\n{{b}}asdf{{/b}}\n{{b}}adsf{{/b}}\nasdf\nadsf\nasdf';
+    const result = applyDisplayEdit(model, '', 0);
+    expect(result.nextModel).toBe('');
+    expect(modelToMirrorHtml(result.nextModel)).toBe('');
   });
 
   it('rebalances bold across Enter so markers are not left open on a line', () => {

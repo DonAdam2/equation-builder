@@ -20,3 +20,6 @@ stats.json
 
 #npmrc because i'm storing my font awesome token inside it
 .npmrc
+
+# CodePen paste packs (generated, not part of the app)
+/codepen/

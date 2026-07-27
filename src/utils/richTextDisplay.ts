@@ -142,7 +142,59 @@ const hasOpenDepth = (before: string, tag: string): boolean => {
   return depth > 0;
 };
 
-/** Removes empty inline pairs and clearly orphaned close markers. */
+const INLINE_TOKEN_RE = /\{\{(\/?)(b|i|u|sup|sub)\}\}/g;
+
+/**
+ * Drops open tags with no matching close after them. Deleting a display range
+ * can eat a run's close marker while the hidden open survives (e.g. select-all
+ * delete leaves `{{b}}`), which the mirror would render as literal text.
+ */
+const dropOrphanOpens = (value: string): string => {
+  const tokens: Array<{ index: number; length: number; tag: string; isClose: boolean }> = [];
+  INLINE_TOKEN_RE.lastIndex = 0;
+  let match = INLINE_TOKEN_RE.exec(value);
+  while (match) {
+    tokens.push({
+      index: match.index,
+      length: match[0].length,
+      tag: match[2],
+      isClose: match[1] === '/',
+    });
+    match = INLINE_TOKEN_RE.exec(value);
+  }
+
+  // Walk backwards matching opens to later closes; unmatched opens are orphans.
+  const unmatchedCloses: Record<string, number> = {};
+  const orphanIndices = new Set<number>();
+  for (let i = tokens.length - 1; i >= 0; i -= 1) {
+    const token = tokens[i];
+    if (token.isClose) {
+      unmatchedCloses[token.tag] = (unmatchedCloses[token.tag] ?? 0) + 1;
+      continue;
+    }
+    if ((unmatchedCloses[token.tag] ?? 0) > 0) {
+      unmatchedCloses[token.tag] -= 1;
+    } else {
+      orphanIndices.add(token.index);
+    }
+  }
+
+  if (!orphanIndices.size) {
+    return value;
+  }
+
+  let result = '';
+  let last = 0;
+  for (const token of tokens) {
+    if (orphanIndices.has(token.index)) {
+      result += value.slice(last, token.index);
+      last = token.index + token.length;
+    }
+  }
+  return result + value.slice(last);
+};
+
+/** Removes empty inline pairs and clearly orphaned open/close markers. */
 export const cleanupRichTextMarkers = (value: string): string => {
   let next = value;
   let previous = '';
@@ -168,8 +220,9 @@ export const cleanupRichTextMarkers = (value: string): string => {
     index += 1;
   }
 
+  next = dropOrphanOpens(cleaned);
+
   previous = '';
-  next = cleaned;
   while (next !== previous) {
     previous = next;
     next = next.replace(/\{\{(b|i|u|sup|sub)\}\}\{\{\/\1\}\}/g, '');
