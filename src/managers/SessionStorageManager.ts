@@ -14,7 +14,7 @@ class SessionStorageManager {
       const value = sessionStorage.getItem(key);
       try {
         return decryptData(value);
-      } catch (e) {
+      } catch {
         return value;
       }
     }

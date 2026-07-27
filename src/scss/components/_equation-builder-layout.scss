@@ -1,0 +1,70 @@
+@use '../generic/variables' as *;
+
+.equation-builder-layout-wrapper {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.equation-builder-header {
+  padding: 0.25rem 0.15rem 0.5rem;
+}
+
+.equation-builder-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $blue-gray-500;
+}
+
+.equation-builder-header h1 {
+  margin: 0;
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 700;
+  color: $blue-gray-800;
+}
+
+.equation-builder-subtitle {
+  margin: 0.55rem 0 0;
+  max-width: 42rem;
+  color: $blue-gray-600;
+  line-height: 1.5;
+}
+
+.equation-builder-panel {
+  background: rgba($white, 0.92);
+  border: 1px solid $blue-gray-200;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px rgba($blue-gray-800, 0.04);
+  padding: 1.1rem 1.2rem;
+}
+
+.equation-section-heading {
+  margin-bottom: 0.9rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: $blue-gray-800;
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: $blue-gray-500;
+    font-size: 0.92rem;
+  }
+}
+
+@media (max-width: $tablet) {
+  .equation-builder-layout-wrapper {
+    gap: 1rem;
+  }
+
+  .equation-builder-panel {
+    padding: 0.95rem;
+  }
+}

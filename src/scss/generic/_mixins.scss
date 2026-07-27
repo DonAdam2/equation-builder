@@ -1,13 +1,168 @@
-//dark hover mixin -> it has the orange background hover by default. you can change it if you like
-@mixin hover-color-dark($color: white, $background-color: green, $c-value: 0%, $bg-value: 5%) {
-  color: darken($color, $c-value);
-  background-color: darken($background-color, $bg-value);
-  border: 1px solid $background-color;
-}
+@use 'sass:map';
+@use './variables' as *;
 
-//light hover mixin -> it has the orange background hover by default. you can change it if you like
-@mixin hover-color-light($color: white, $background-color: green, $c-value: 0%, $bg-value: 5%) {
-  color: lighten($color, $c-value);
-  background-color: lighten($background-color, $bg-value);
-  border: 1px solid $background-color;
+@mixin outlined-button($args: ()) {
+  $default-args: (
+    color: $black,
+    borderColor: $black,
+    background: transparent,
+    isDisabledOpacity: false,
+  );
+  // merge defaults with passed args
+  $args: map.merge($default-args, $args);
+
+  $color: map.get($args, color);
+  $borderColor: map.get($args, borderColor);
+  $background: map.get($args, background);
+  $isDisabledOpacity: map.get($args, isDisabledOpacity);
+
+  color: $color;
+  background: $background;
+  border: 1px solid $borderColor;
+
+  &:disabled {
+    @if $isDisabledOpacity {
+      opacity: 0.5;
+    } @else {
+      @include disable-outlined-background;
+    }
+  }
+
+  .button-icon {
+    fill: $color;
+  }
+}
+//main button styles
+@mixin main-button($args: ()) {
+  $default-args: (
+    color: $white,
+    background: $black,
+    gradientBackground: $gradient-blue,
+    isGradientBackground: false,
+  );
+  // merge defaults with passed args
+  $args: map.merge($default-args, $args);
+
+  $color: map.get($args, color);
+  $background: map.get($args, background);
+  $gradientBackground: map.get($args, gradientBackground);
+  $isGradientBackground: map.get($args, isGradientBackground);
+
+  color: $color;
+
+  @if $isGradientBackground {
+    background: $gradientBackground;
+  } @else {
+    background: $background;
+  }
+
+  &:disabled {
+    @include disable-background;
+  }
+
+  .button-icon {
+    fill: $color;
+  }
+}
+//text button styles
+@mixin text-button($args: ()) {
+  $default-args: (
+    color: $black,
+    background: transparent,
+  );
+  // merge defaults with passed args
+  $args: map.merge($default-args, $args);
+
+  $color: map.get($args, color);
+  $background: map.get($args, background);
+
+  color: $color;
+  background: $background;
+  padding: 0.2rem 0.75rem;
+
+  &:hover {
+    box-shadow: none;
+    opacity: 0.9;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: $blue-gray-400;
+    opacity: 1;
+    text-decoration: none;
+
+    .button-icon {
+      fill: $blue-gray-400;
+    }
+  }
+
+  .button-icon {
+    fill: $color;
+  }
+}
+//outlined text button
+@mixin outlined-text-button($args: ()) {
+  $default-args: (
+    color: $black,
+    borderColor: $black,
+    background: transparent,
+  );
+  // merge defaults with passed args
+  $args: map.merge($default-args, $args);
+
+  $color: map.get($args, color);
+  $borderColor: map.get($args, borderColor);
+  $background: map.get($args, background);
+
+  color: $color;
+  background: $background;
+  border: 1px solid $borderColor;
+  padding: 0.2rem 0.75rem;
+
+  &:hover {
+    box-shadow: none;
+    opacity: 0.9;
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: $blue-gray-400;
+    border-color: $blue-gray-400;
+    opacity: 1;
+    text-decoration: none;
+
+    .button-icon {
+      fill: $blue-gray-400;
+    }
+  }
+
+  .button-icon {
+    fill: $color;
+  }
+}
+//disabled button styles
+@mixin disable-background($color: $black, $background: $black) {
+  box-shadow: none;
+  color: rgba($color, 0.26);
+  background: rgba($background, 0.12);
+  border-color: rgba($background, 0.12);
+
+  .button-icon {
+    fill: rgba($color, 0.26);
+    path {
+      stroke: rgba($color, 0.26);
+    }
+  }
+}
+//disabled outlined button styles
+@mixin disable-outlined-background($color: $black, $background: $black) {
+  box-shadow: none;
+  color: rgba($color, 0.26);
+  border-color: rgba($background, 0.26);
+
+  .button-icon {
+    fill: rgba($color, 0.26);
+  }
 }

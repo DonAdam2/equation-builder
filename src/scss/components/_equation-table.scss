@@ -1,0 +1,36 @@
+@use '../generic/variables' as *;
+
+.equation-table-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.equation-table-keyboard-region {
+  outline: none;
+  border-radius: 0.5rem;
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba($blue-500, 0.18);
+  }
+}
+
+.equation-datatable {
+  .body-tr {
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: rgba($blue-300, 0.12);
+    }
+
+    &.is-keyboard-active {
+      background-color: rgba($blue-500, 0.14);
+      box-shadow: inset 3px 0 0 $blue-500;
+    }
+  }
+
+  .datatable-search-input,
+  input[type='search'],
+  input[type='text'] {
+    border-radius: 0.5rem;
+  }
+}

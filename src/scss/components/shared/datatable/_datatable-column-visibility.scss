@@ -1,0 +1,20 @@
+@use '../../../generic/variables' as *;
+
+.visibility-header {
+  padding: 0 !important;
+}
+
+.actions-col-visibility-button {
+  padding: 0 !important;
+  border: none !important;
+  color: $neutral-500 !important;
+  background-color: transparent !important;
+
+  &:hover {
+    box-shadow: none !important;
+  }
+
+  svg {
+    width: 1em;
+  }
+}

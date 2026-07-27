@@ -1,0 +1,85 @@
+@use '../generic/variables' as *;
+
+.equation-preview-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.equation-preview-canvas {
+  min-height: 120px;
+  border: 1px solid $blue-gray-200;
+  border-radius: 0.65rem;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+}
+
+.equation-preview-empty,
+.equation-preview-error {
+  margin: 0;
+  color: $blue-gray-500;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.equation-preview-error {
+  color: $red-400;
+}
+
+.equation-preview-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.equation-preview-block {
+  width: 100%;
+
+  // KaTeX display math defaults to text-align:center on both
+  // .katex-display and .katex-display > .katex — override both.
+  .katex-display {
+    display: block;
+    width: 100%;
+    margin: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .katex-display > .katex {
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  .katex {
+    font-size: 1.35em;
+  }
+
+  &.is-left {
+    text-align: left;
+
+    .katex-display,
+    .katex-display > .katex {
+      text-align: left;
+    }
+  }
+
+  &.is-center {
+    text-align: center;
+
+    .katex-display,
+    .katex-display > .katex {
+      text-align: center;
+    }
+  }
+
+  &.is-right {
+    text-align: right;
+
+    .katex-display,
+    .katex-display > .katex {
+      text-align: right;
+    }
+  }
+}

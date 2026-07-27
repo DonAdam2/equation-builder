@@ -14,7 +14,7 @@ class LocalStorageManager {
       const value = localStorage.getItem(key);
       try {
         return decryptData(value);
-      } catch (e) {
+      } catch {
         return value;
       }
     }

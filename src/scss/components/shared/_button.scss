@@ -1,0 +1,304 @@
+@use '../../generic/variables' as *;
+@use '../../generic/mixins' as *;
+
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  background-color: transparent;
+  border: none;
+  border-radius: 1.2rem;
+  transition: box-shadow 0.3s;
+  transform: translateZ(0);
+  letter-spacing: 0.05rem;
+
+  //variants
+  &.primary {
+    @include main-button(
+      (
+        background: $blue,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          gradientBackground: $gradient-blue,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $blue,
+          borderColor: $blue,
+        )
+      );
+    }
+  }
+  &.secondary {
+    @include main-button(
+      (
+        color: $white,
+        background: $blue-gray-500,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          gradientBackground: $gradient-gray,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $blue-gray-500,
+          borderColor: $blue-gray-500,
+        )
+      );
+    }
+  }
+  &.success {
+    @include main-button(
+      (
+        background: $emerald-500,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          gradientBackground: $gradient-emerald,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $emerald-500,
+          borderColor: $emerald-500,
+        )
+      );
+    }
+  }
+  &.danger {
+    @include main-button(
+      (
+        background: $red-400,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          gradientBackground: $gradient-red,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $red-400,
+          borderColor: $red-400,
+        )
+      );
+    }
+  }
+  &.warning {
+    @include main-button(
+      (
+        color: $black,
+        background: $orange-500,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          color: $black,
+          gradientBackground: $gradient-orange,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $orange-500,
+          borderColor: $orange-500,
+        )
+      );
+    }
+  }
+  &.info {
+    @include main-button(
+      (
+        color: $white,
+        background: $light-blue,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          gradientBackground: $gradient-light-blue,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $light-blue,
+          borderColor: $light-blue,
+        )
+      );
+    }
+  }
+  &.light {
+    @include main-button(
+      (
+        color: $black,
+        background: $light-gray,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          color: $black,
+          gradientBackground: $gradient-light-gary,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $dark-gray,
+          borderColor: $dark-gray,
+        )
+      );
+    }
+  }
+  &.dark {
+    @include main-button(
+      (
+        background: $dark-gray,
+      )
+    );
+    &.gradient-background {
+      @include main-button(
+        (
+          gradientBackground: $gradient-dark-gary,
+          isGradientBackground: true,
+        )
+      );
+    }
+    &-outlined {
+      @include outlined-button(
+        (
+          color: $black,
+          borderColor: $black,
+        )
+      );
+    }
+  }
+  &.link {
+    @include text-button(
+      (
+        color: $blue,
+      )
+    );
+    &-outlined {
+      @include outlined-text-button(
+        (
+          color: $blue,
+          borderColor: $blue,
+        )
+      );
+    }
+  }
+  &.white {
+    @include main-button(
+      (
+        color: $blue-gray-500,
+        background: $white,
+      )
+    );
+  }
+
+  &.centered {
+    align-items: center;
+    justify-content: center;
+  }
+
+  // sized
+  &.small {
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 1rem;
+
+    &.round {
+      height: 1.75rem;
+      width: 1.75rem;
+    }
+  }
+  &.medium {
+    font-size: 1rem;
+    padding: 0.4375rem 1.5625rem;
+    &.round {
+      height: 2rem;
+      width: 2rem;
+    }
+  }
+  &.large {
+    font-size: 1.125rem;
+    padding: 0.55rem 2rem;
+    &.round {
+      height: 2.5rem;
+      width: 2.5rem;
+    }
+  }
+
+  &.round {
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  &.rectangle {
+    border-radius: 10px;
+  }
+
+  &.fluid {
+    width: 100%;
+  }
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 1px 1px 8px 3px rgb(0 0 0 / 20%);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+
+  .button-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .button-icon {
+    display: flex;
+  }
+}

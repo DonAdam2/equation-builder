@@ -204,6 +204,26 @@ module.exports = [
               position: 'before',
             },
             {
+              pattern: '@/models/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/data/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/utils/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
+              pattern: '@/contexts/**',
+              group: 'internal',
+              position: 'before',
+            },
+            {
               pattern: '@/constants/**',
               group: 'internal',
               position: 'before',

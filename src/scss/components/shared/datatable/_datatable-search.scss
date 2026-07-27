@@ -1,0 +1,46 @@
+@use '../../../generic/variables' as *;
+
+.datatable-search-wrapper {
+  min-width: 150px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: $white;
+  border: 1px solid $cool-gray-300;
+  border-radius: 0.556rem;
+  overflow: hidden;
+  padding-inline-start: 0.5rem;
+
+  &-disabled {
+    background-color: #f5f5f5;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .search-input {
+    font-size: 16px;
+    line-height: 1.5;
+    width: 100%;
+    min-width: 0;
+    padding: 0.5em 0;
+    border: none;
+    color: #475569;
+    outline: none;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: #838d99;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .search-icon {
+    pointer-events: none;
+  }
+}

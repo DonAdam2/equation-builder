@@ -11,6 +11,7 @@ import store from '@/store/store';
 import App from './App';
 
 import './scss/global.scss';
+import 'react-toastify/dist/ReactToastify.css';
 /* PLOP_INJECT_PWA_IMPORTS */
 
 const container = document.getElementById('root'),

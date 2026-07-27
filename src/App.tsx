@@ -1,17 +1,18 @@
 import { lazy, Suspense } from 'react';
 
 import { ErrorBoundary } from 'react-error-boundary';
+import { ToastContainer } from 'react-toastify';
 
 import ErrorBoundaryFallback from '@/components/errorBoundaryFallback/ErrorBoundaryFallback';
 
 import LoadingIcon from './components/shared/LoadingIcon';
-const TestComponent = lazy(() => import('@/components/testComponent/TestComponent'));
+
+const EquationBuilderPage = lazy(() => import('@/pages/equationBuilderPage/EquationBuilderPage'));
 
 const App = () => (
   <ErrorBoundary
     FallbackComponent={ErrorBoundaryFallback}
     onReset={() => {
-      //Reset the state of your app so the error doesn't happen again
       console.log('Try again clicked');
     }}
   >
@@ -22,9 +23,15 @@ const App = () => (
         </div>
       }
     >
-      <h1 style={{ textAlign: 'center' }}>Webpack react boilerplate</h1>
-      <TestComponent />
+      <EquationBuilderPage />
     </Suspense>
+    <ToastContainer
+      position="bottom-center"
+      autoClose={3000}
+      limit={1}
+      pauseOnHover
+      hideProgressBar
+    />
   </ErrorBoundary>
 );
 

@@ -1,0 +1,11 @@
+@use '../generic/variables' as *;
+
+.equation-builder-wrapper {
+  min-height: 100vh;
+  padding: 2rem 1rem 3rem;
+  background:
+    radial-gradient(circle at top left, rgba($blue-300, 0.35), transparent 32%),
+    linear-gradient(180deg, #eef3f8 0%, #f7f9fc 42%, #ffffff 100%);
+  color: $cool-gray-900;
+  text-align: left;
+}

@@ -1,0 +1,8 @@
+@use '../../generic/variables' as *;
+
+.paper-wrapper {
+  background-color: $cool-gray-50;
+  border-radius: 15px;
+  overflow: hidden;
+  padding: 1rem;
+}

@@ -1,0 +1,34 @@
+@use '../../../generic/variables' as *;
+
+.datatable-icon-button {
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: transparent;
+  fill: $black;
+
+  i {
+    font-size: 1rem;
+  }
+
+  svg {
+    width: 1rem;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: $cool-gray-150;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: transparent;
+    opacity: 0.5;
+  }
+}

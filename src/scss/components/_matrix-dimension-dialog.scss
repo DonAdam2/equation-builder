@@ -1,0 +1,52 @@
+@use '../generic/variables' as *;
+
+.matrix-dimension-dialog {
+  .matrix-dimension-dialog-description {
+    margin: 0 0 1rem;
+    color: $blue-gray-500;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .matrix-dimension-dialog-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+
+    &.is-multiplication {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $blue-gray-600;
+    }
+
+    input[type='number'] {
+      border: 1px solid $blue-gray-300;
+      border-radius: 0.5rem;
+      padding: 0.55rem 0.7rem;
+      font-size: 1rem;
+      color: $cool-gray-900;
+
+      &:focus {
+        outline: none;
+        border-color: $blue-500;
+        box-shadow: 0 0 0 3px rgba($blue-500, 0.15);
+      }
+    }
+  }
+
+  .matrix-dimension-dialog-preview {
+    grid-column: 1 / -1;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.5rem;
+    background: $cool-gray-50;
+    color: $blue-gray-600;
+    font-size: 0.9rem;
+  }
+}

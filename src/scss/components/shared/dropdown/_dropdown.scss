@@ -1,0 +1,340 @@
+@use '../../../generic/variables' as *;
+
+.label {
+  color: $blue-gray-600;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  margin: 0 0 8px 0;
+  text-transform: capitalize;
+  user-select: none;
+
+  & + span {
+    align-self: flex-start;
+  }
+
+  &.error-label {
+    color: $red-400;
+  }
+}
+
+.error-message {
+  color: $red-400;
+  font-size: 0.889rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 19px;
+  margin: 0;
+  padding-top: 12px;
+}
+
+.dropdown-wrapper {
+  border-radius: 6px;
+  border: 1px solid $light-gray-200;
+  background-color: $white;
+  display: inline-block;
+
+  &.no-border {
+    border: none;
+    background-color: transparent;
+  }
+
+  &.dropdown-error {
+    border-color: $red-400;
+
+    .selected-option {
+      .selected-option-label {
+        color: $red-400;
+      }
+    }
+    .dropdwon-arrow-icon {
+      fill: $red-400;
+    }
+  }
+
+  .dropdown-header {
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .dropdown-inner-header {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .selected-option {
+      display: inline-flex;
+      align-items: center;
+      padding-inline-end: 10px;
+      user-select: none;
+
+      &-icon {
+        display: inline-flex;
+        align-items: center;
+        padding-inline-end: 5px;
+      }
+
+      &-label {
+        color: $blue-gray-600;
+        font-size: 15px;
+        font-weight: 500;
+        line-height: 21px;
+        white-space: nowrap;
+      }
+    }
+
+    .static-head-label {
+      padding-inline-end: 5px;
+    }
+
+    .selected-option-chip {
+      display: flex;
+      align-items: center;
+      background-color: #e6e6e6;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 14px;
+      margin: 2px;
+      user-select: none;
+
+      .selected-option-icon {
+        padding: 0;
+
+        svg {
+          width: 15px;
+          height: 15px;
+        }
+      }
+
+      .chip-label {
+        padding: 0 4px;
+
+        &:hover {
+          cursor: initial;
+        }
+      }
+
+      .remove-option-button {
+        border: none;
+        outline: none;
+        background-color: transparent;
+        font-size: 12px;
+        color: #555;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        padding: 0;
+
+        &:hover:enabled {
+          svg {
+            fill: $black;
+          }
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .search-options-input {
+      flex: 1 1 auto;
+      border: none;
+      outline: none;
+      margin: 2px;
+      display: inline-grid;
+      grid-area: 1 / 1 / 2 / 3;
+      grid-template-columns: 0 min-content;
+      min-width: 30px;
+      width: 0;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+    }
+
+    .icons-wrapper {
+      display: flex;
+      align-items: center;
+
+      .clearable-icon {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-inline-end: 5px;
+
+        &:hover {
+          svg {
+            opacity: 0.7;
+          }
+        }
+      }
+
+      .dropdwon-arrow-icon {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+
+        .chevron-down-icon {
+          fill: $blue-gray-600;
+        }
+      }
+    }
+
+    &.disabled-dropdown {
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      .clearable-icon {
+        &:hover {
+          svg {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}
+
+.dropdown-body {
+  padding: 20px 0;
+  border-radius: 0.75rem;
+  background-color: $white;
+  min-width: 12rem;
+  box-shadow:
+    0 8px 16px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  z-index: 100;
+
+  &.open {
+    position: absolute;
+  }
+
+  .dropdown-loading-wrapper {
+    padding: 16px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .options-group-label {
+    font-weight: 500;
+    font-family:
+      Roboto,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Helvetica Neue',
+      Helvetica,
+      sans-serif;
+    font-size: 12px;
+    color: #999999;
+    padding: 0 5px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .options-count {
+      border-radius: 5px;
+      padding: 2px 5px;
+      background: $light-gray;
+      color: #000000;
+      font-size: 1em;
+      line-height: 14px;
+    }
+  }
+
+  .dropdown-item {
+    user-select: none;
+    display: flex;
+    align-items: center;
+
+    &.mark-selected-option {
+      background-color: $blue-gray-100;
+      padding: 10px;
+
+      &:hover {
+        cursor: initial;
+        background-color: $blue-gray-100;
+      }
+
+      &.is-disabled {
+        background-color: transparent;
+        cursor: not-allowed;
+        opacity: 0.7;
+
+        &:hover {
+          cursor: not-allowed;
+          background-color: transparent;
+        }
+      }
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    &.is-disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+
+      &:hover {
+        cursor: not-allowed;
+        background-color: transparent;
+      }
+    }
+
+    &-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.left-position {
+        padding-inline-end: 10px;
+      }
+
+      &.right-position {
+        padding-inline-start: 10px;
+      }
+    }
+
+    &-label {
+      font-size: 14px;
+      color: $blue-gray-500;
+      display: inline-flex;
+      align-items: center;
+
+      input[type='checkbox'] {
+        margin-inline-end: 8px;
+      }
+    }
+
+    &-description {
+      color: $blue-gray-600;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 25px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba($black, 0.2);
+    }
+
+    &.no-options {
+      cursor: initial;
+      background-color: transparent;
+      justify-content: center;
+    }
+
+    &.active-suggestion {
+      background-color: rgba($black, 0.2);
+    }
+  }
+}

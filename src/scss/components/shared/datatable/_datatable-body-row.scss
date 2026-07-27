@@ -1,0 +1,156 @@
+@use '../../../generic/variables' as *;
+
+.datatable-body-row-wrapper {
+}
+
+// Drag and drop animations for table rows
+.body-tr {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Row that can be dragged
+  &.row-draggable {
+    &:hover {
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+  }
+
+  // Row currently being dragged
+  &.row-dragging {
+    opacity: 0.8;
+    transform: translateY(-2px);
+    z-index: 1000;
+    border-radius: 6px;
+
+    // Use box-shadow to create full-width background and border
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 0 0 2px rgba(59, 130, 246, 0.4),
+      inset 0 0 0 1000px rgba(59, 130, 246, 0.1);
+
+    td {
+      border-color: transparent;
+      background-color: transparent;
+    }
+  }
+
+  // Row that can accept drops
+  &.row-drop-target {
+    transition: all 0.2s ease;
+  }
+
+  // Row with item being dragged over it
+  &.row-drag-over {
+    transform: translateY(-1px);
+    border-radius: 6px;
+
+    // Use box-shadow to create dashed border effect and background
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.1),
+      inset 0 0 0 2px rgba(16, 185, 129, 0.5),
+      inset 0 0 0 1000px rgba(16, 185, 129, 0.1);
+
+    td {
+      border-color: transparent;
+      background-color: transparent;
+    }
+  }
+}
+
+// Drag handle styles
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  min-width: 20px;
+  overflow: visible; // Allow icon to scale outside container during hover animations
+  position: relative; // Ensure proper stacking context for scaled icons
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &.drag-handle-active {
+    transform: scale(1.1);
+  }
+
+  .move-element {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-in-out; // Smooth scaling transition
+    z-index: 1; // Ensure scaled icon appears above adjacent content
+
+    svg {
+      transition: all 0.2s ease;
+    }
+  }
+
+  &:hover .move-element svg {
+    color: rgba(99, 102, 241, 0.8);
+    transform: scale(1.1);
+  }
+
+  &.drag-handle-active .move-element svg {
+    color: rgba(99, 102, 241, 1);
+    transform: scale(1.2);
+  }
+}
+
+// Drag placeholder to maintain spacing
+.drag-placeholder {
+  width: 20px;
+  min-width: 20px;
+  margin-inline-end: 10px;
+}
+
+// Improved transitions for all interactive states
+.body-tr {
+  &:not(.row-dragging):not(.row-drag-over) {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+  }
+}
+
+// Drag image styling
+.drag-image {
+  opacity: 0.9;
+  transform: rotate(2deg);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/****** Custom drag and drop classes - users can override these with their own styling ******/
+.custom-drag-style {
+  &.row-dragging {
+    box-shadow:
+      0 4px 12px rgba(239, 68, 68, 0.25),
+      inset 0 0 0 2px rgba(239, 68, 68, 0.4),
+      inset 0 0 0 1000px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.custom-drop-zone {
+  &.row-drag-over {
+    box-shadow:
+      0 2px 8px rgba(245, 158, 11, 0.8),
+      inset 0 0 0 2px rgba(245, 158, 11, 0.4),
+      inset 0 0 0 1000px rgba(245, 158, 11, 0.1);
+  }
+}
+
+// Custom drag handle styling
+.custom-drag-style-handle {
+  background-color: rgba(239, 68, 68, 0.1);
+
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+  }
+
+  &.drag-handle-active {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+}

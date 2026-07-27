@@ -1,0 +1,45 @@
+@use '../../../generic/variables' as *;
+
+.datatable-title-wrapper {
+  padding-bottom: 1rem;
+  display: flex;
+  align-items: center;
+
+  &.is-in-search-row {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    gap: 1rem;
+  }
+
+  &.remove-padding {
+    padding: 0;
+  }
+
+  .table-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+    color: $blue-gray-600;
+    margin: 0;
+  }
+
+  .datatable-title-buttons-wrapper {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    width: 120px;
+
+    &.no-title {
+      width: auto;
+    }
+
+    @media (min-width: 500px) {
+      width: auto;
+    }
+  }
+}

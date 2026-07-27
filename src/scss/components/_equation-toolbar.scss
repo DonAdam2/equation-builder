@@ -1,0 +1,32 @@
+@use '../generic/variables' as *;
+
+.equation-toolbar-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.equation-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.equation-toolbar-align {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.15rem;
+  border: 1px solid $blue-gray-200;
+  border-radius: 0.5rem;
+  background: $cool-gray-50;
+}
+
+.equation-toolbar-status {
+  margin: 0;
+  color: $blue-gray-600;
+  font-size: 0.9rem;
+}

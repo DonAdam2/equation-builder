@@ -1,0 +1,176 @@
+@use '../generic/variables' as *;
+
+.symbol-keyboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.symbol-keyboard-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  align-self: flex-start;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid $blue-gray-300;
+  border-radius: 0.45rem;
+  background: $white;
+  color: $blue-gray-600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: $blue-gray-100;
+    border-color: $blue-gray-400;
+    color: $blue-gray-800;
+  }
+
+  &[aria-expanded='true'] {
+    border-color: $blue-500;
+    color: $blue-500;
+    box-shadow: 0 0 0 3px rgba($blue-500, 0.12);
+  }
+}
+
+.symbol-keyboard-panel {
+  border: 1px solid $blue-gray-200;
+  border-radius: 0.65rem;
+  background: $white;
+  box-shadow: 0 10px 28px rgba($blue-gray-800, 0.08);
+  overflow: hidden;
+}
+
+.symbol-keyboard-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid $blue-gray-200;
+  background: $cool-gray-50;
+}
+
+.symbol-keyboard-tab {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: $blue-gray-600;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.is-active {
+    color: $blue-500;
+    border-bottom-color: $blue-500;
+    background: $white;
+  }
+}
+
+.symbol-keyboard-body {
+  max-height: 320px;
+  overflow: auto;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.symbol-keyboard-hint {
+  margin: 0 0 0.75rem;
+  color: $blue-gray-500;
+  font-size: 0.85rem;
+}
+
+.symbol-keyboard-section + .symbol-keyboard-section {
+  margin-top: 1rem;
+}
+
+.symbol-keyboard-section-title {
+  margin: 0 0 0.45rem;
+  color: $blue-gray-600;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.symbol-keyboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr));
+  gap: 0.25rem;
+}
+
+.symbol-keyboard-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.1rem;
+  padding: 0.15rem;
+  border: 1px solid $blue-gray-200;
+  border-radius: 0.3rem;
+  background: $cool-gray-50;
+  color: $cool-gray-900;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease;
+
+  &:hover {
+    background: $white;
+    border-color: $blue-500;
+    color: $blue-500;
+  }
+
+  &:active {
+    background: rgba($blue-500, 0.08);
+  }
+}
+
+.symbol-keyboard-special-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.symbol-keyboard-special-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: $cool-gray-900;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: $blue-gray-100;
+    border-color: $blue-gray-200;
+  }
+}
+
+.symbol-keyboard-special-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.8rem;
+  border: 1px solid $blue-gray-200;
+  border-radius: 0.3rem;
+  background: $cool-gray-50;
+  font-size: 1.05rem;
+}
+
+.symbol-keyboard-special-name {
+  font-size: 0.92rem;
+}
+
+.symbol-keyboard-special-shortcut {
+  color: $blue-gray-500;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}

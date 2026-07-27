@@ -1,47 +1,63 @@
-.loader-wrapper {
-  height: 100%;
+@use '../../generic/variables' as *;
+
+.center-loader-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: rgba($black, 0.3);
+  z-index: 10;
 }
 
-.lds-ring {
-  display: inline-block;
-  position: relative;
-  width: 54px;
-  height: 54px;
+.circular {
+  animation: rotate 2s linear infinite;
+  height: 20px;
+  width: 20px;
+}
 
-  div {
-    box-sizing: border-box;
-    display: block;
-    position: absolute;
-    width: 44px;
-    height: 44px;
-    margin: 6px;
-    border: 6px solid #ff2058;
-    border-radius: 50%;
-    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: #ff2058 transparent transparent transparent;
+.path {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  animation:
+    dash 1.5s ease-in-out infinite,
+    color 6s ease-in-out infinite;
+  stroke-linecap: round;
+  stroke: $blue;
+}
 
-    &:nth-child(1) {
-      animation-delay: -0.45s;
-    }
+.transform-icon {
+  transform: none;
+}
 
-    &:nth-child(2) {
-      animation-delay: -0.3s;
-    }
-
-    &:nth-child(3) {
-      animation-delay: -0.15s;
-    }
+body[dir='rtl'] {
+  .transform-icon {
+    transform: rotate(180deg);
+  }
+  .revert-transform-icon {
+    transform: none;
   }
 }
 
-@keyframes lds-ring {
-  0% {
-    transform: rotate(0deg);
-  }
+@keyframes rotate {
   100% {
     transform: rotate(360deg);
+  }
+}
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124;
   }
 }

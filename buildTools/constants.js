@@ -17,12 +17,12 @@ module.exports = {
   isCssModules: false,
   metaInfo: {
     //displayed in search engines at the top of URL
-    siteName: 'App site name',
+    siteName: 'AI Formula Builder',
     //max 60 (recommended)
-    title: 'App title',
+    title: 'AI Formula Builder',
     //max 150 (recommended)
-    description: 'description',
-    keywords: 'add you keywords',
+    description: 'Build AI/ML mathematical equations quickly for Microsoft Word.',
+    keywords: 'equations, mathematics, AI, machine learning, formula builder',
     twitterCardType: 'summary', //summary - summary_large_image - app
   },
 };
