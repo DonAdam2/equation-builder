@@ -10,8 +10,7 @@ const EquationBuilderLayout = ({
   return (
     <div className="equation-builder-layout-wrapper">
       <header className="equation-builder-header">
-        <p className="equation-builder-eyebrow">University of Bath · Mathematics for AI</p>
-        <h1>AI Formula Builder</h1>
+        <h1>Equation Builder</h1>
         <p className="equation-builder-subtitle">
           Build mathematical expressions quickly, then copy them into Word or export a PDF.
         </p>
