@@ -694,6 +694,14 @@ export const equations: Equation[] = [
     expectedVariables: ['A', 'B'],
     category: 'Probability',
   },
+  {
+    id: 'probability-function',
+    name: 'Probability Function',
+    description: 'Countable additivity of a probability measure over pairwise disjoint events.',
+    template: 'P(⋃_{i=1}^{∞} Aᵢ) = ∑_{i=1}^{∞} P(Aᵢ)',
+    expectedVariables: ['A'],
+    category: 'Probability',
+  },
 ];
 
 export const getEquationById = (id: string): Equation | undefined =>
