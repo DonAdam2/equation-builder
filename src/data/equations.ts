@@ -702,6 +702,15 @@ export const equations: Equation[] = [
     expectedVariables: ['A'],
     category: 'Probability',
   },
+  {
+    id: 'discrete-pmf-cases',
+    name: 'Piecewise PMF',
+    description: 'Probability mass function of a discrete random variable defined by cases.',
+    template:
+      '$$f_X(x) = \\begin{cases} \\frac{1}{4} & \\text{if } x=0 \\text{ or } x=2 \\\\ \\frac{1}{2} & \\text{if } x=1 \\\\ 0 & \\text{otherwise} \\end{cases}$$',
+    expectedVariables: ['x'],
+    category: 'Probability',
+  },
 ];
 
 export const getEquationById = (id: string): Equation | undefined =>
