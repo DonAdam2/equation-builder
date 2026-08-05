@@ -711,6 +711,15 @@ export const equations: Equation[] = [
     expectedVariables: ['x'],
     category: 'Probability',
   },
+  {
+    id: 'distribution-function-cases',
+    name: 'Distribution Function',
+    description: 'Cumulative distribution function of a discrete random variable defined by cases.',
+    template:
+      '$$F_X(x) = \\begin{cases} 0 & x < 0 \\\\ \\frac{1}{4} & 0 \\le x < 1 \\\\ \\frac{3}{4} & 1 \\le x < 2 \\\\ 1 & x \\ge 2 \\end{cases}$$',
+    expectedVariables: ['x'],
+    category: 'Probability',
+  },
 ];
 
 export const getEquationById = (id: string): Equation | undefined =>
