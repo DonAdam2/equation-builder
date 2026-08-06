@@ -720,6 +720,23 @@ export const equations: Equation[] = [
     expectedVariables: ['x'],
     category: 'Probability',
   },
+  {
+    id: 'expectation-of-function',
+    name: 'Expectation of a Function',
+    description: 'Expected value of a function of a discrete random variable (LOTUS).',
+    template: 'E(g(X)) = ∑_{x} g(x) f_X(x)',
+    expectedVariables: ['g', 'X', 'x'],
+    category: 'Probability',
+  },
+  {
+    id: 'binomial-pmf-cases',
+    name: 'Binomial PMF',
+    description: 'Probability mass function of a binomial random variable defined by cases.',
+    template:
+      '$$f_x(k) = \\begin{cases} \\binom{n}{k} p^k (1-p)^{n-k} & \\text{if } k \\in \\{0, 1, 2, \\dots, n\\} \\\\ 0 & \\text{otherwise} \\end{cases}$$',
+    expectedVariables: ['k', 'n', 'p'],
+    category: 'Probability',
+  },
 ];
 
 export const getEquationById = (id: string): Equation | undefined =>
