@@ -116,7 +116,7 @@ const DropdownComponent = ({ wrapper, header, body }: DropdownComponentInterface
 
   //add unselected option to filtered options if isMultiSelect
   const addUnSelectedOption = (optionValue: string) => {
-    let list = filteredOptions;
+    let list: typeof filteredOptions;
 
     if (isGroupedOptions) {
       //modify original options by appending the position to every group and option

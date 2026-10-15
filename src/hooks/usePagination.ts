@@ -149,7 +149,7 @@ function usePagination({
       const totalBlocks = totalNumbers + 2;
 
       if (pageCount > totalBlocks) {
-        let pages: (number | string)[] = [];
+        let pages: (number | string)[];
 
         const leftBound = activePageNum - 1;
         const rightBound = activePageNum + 1;

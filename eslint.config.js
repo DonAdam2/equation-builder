@@ -9,7 +9,7 @@ const path = require('path'),
   prettierConfig = require('eslint-config-prettier'),
   typescriptEslint = require('@typescript-eslint/eslint-plugin'),
   typescriptParser = require('@typescript-eslint/parser'),
-  importPlugin = require('eslint-plugin-import'),
+  importPlugin = require('eslint-plugin-import-x'),
   globals = require('globals');
 
 module.exports = [
@@ -49,6 +49,7 @@ module.exports = [
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: {
+        ...globals.browser,
         ...globals.node,
         ...globals.jest,
         ...globals.es2015,
@@ -103,7 +104,7 @@ module.exports = [
       'jest-dom': jestDom,
       prettier: prettier,
       '@typescript-eslint': typescriptEslint,
-      import: importPlugin,
+      'import-x': importPlugin,
     },
     rules: {
       // TypeScript ESLint recommended rules
@@ -147,7 +148,7 @@ module.exports = [
       'react-hooks/preserve-manual-memoization': 'off',
 
       // Import ordering rules
-      'import/order': [
+      'import-x/order': [
         'error',
         {
           groups: [
@@ -262,7 +263,7 @@ module.exports = [
       ],
     },
     settings: {
-      'import/resolver': {
+      'import-x/resolver': {
         webpack: {
           config: path.join(__dirname, 'buildTools/webpack.common.js'),
         },
@@ -271,12 +272,12 @@ module.exports = [
           project: path.join(__dirname, 'tsconfig.json'),
         },
       },
-      'import/parsers': {
+      'import-x/parsers': {
         '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
-      'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+      'import-x/extensions': ['.js', '.jsx', '.ts', '.tsx'],
       react: {
-        version: 'detect',
+        version: require('react/package.json').version,
       },
     },
   },

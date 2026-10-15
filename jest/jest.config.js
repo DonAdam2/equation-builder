@@ -16,7 +16,9 @@ module.exports = {
   // A map from regular expressions to paths to transformers
   transform: {
     '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': [
-      'babel-jest',
+      // Resolve from the project root so Jest uses the babel-jest instance paired with
+      // the project's @babel/core 8 (jest-config ships its own copy bound to @babel/core 7)
+      require.resolve('babel-jest'),
       { configFile: path.join(__dirname, '../babel.config.js') },
     ],
     '^.+\\.css$': '<rootDir>/transforms/cssTransform.js',

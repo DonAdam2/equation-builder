@@ -521,7 +521,7 @@ const wrapPlainLatex = (
   style: RichTextLatexStyle
 ): string => {
   const escaped = escapeText(plain);
-  let body = escaped;
+  let body: string;
   if (style.italic && style.bold) {
     body = `\\textbf{\\textit{${escaped}}}`;
   } else if (style.italic) {
