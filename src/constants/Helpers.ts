@@ -1,4 +1,12 @@
-import CryptoJS from 'crypto-js';
+import { gcm } from '@noble/ciphers/aes.js';
+import {
+  bytesToHex,
+  bytesToUtf8,
+  hexToBytes,
+  managedNonce,
+  utf8ToBytes,
+} from '@noble/ciphers/utils.js';
+import { sha256 } from '@noble/hashes/sha2.js';
 
 import LocalStorageManager from '@/managers/LocalStorageManger';
 
@@ -11,6 +19,9 @@ import {
 import { LocalStorageKeys } from '@/constants/Constants';
 
 const secretKey = 'we are the best of the best';
+// Derive a 32-byte AES key from the passphrase. `managedNonce` prepends a random
+// nonce to each ciphertext and strips it on decrypt, so the hex output is self-contained.
+const aes = managedNonce(gcm)(sha256(utf8ToBytes(secretKey)));
 
 export const updateObject = <T extends object, U extends object>(
   oldObject: T,
@@ -23,12 +34,11 @@ export const updateObject = <T extends object, U extends object>(
 export const decodeToken = (token: string) => JSON.parse(atob(token.split('.')[1]));
 
 export const encryptData = (data: any) => {
-  return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
+  return bytesToHex(aes.encrypt(utf8ToBytes(JSON.stringify(data))));
 };
 
 export const decryptData = (data: any) => {
-  const bytes = CryptoJS.AES.decrypt(data, secretKey);
-  return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  return JSON.parse(bytesToUtf8(aes.decrypt(hexToBytes(data))));
 };
 
 export const isAuthenticated = () => LocalStorageManager.getItem(LocalStorageKeys.TOKEN);
