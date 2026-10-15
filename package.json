@@ -110,7 +110,7 @@
     "terser-webpack-plugin": "5.6.1",
     "to-camel-case": "1.0.0",
     "ts-loader": "9.6.2",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "util": "0.12.5",
     "webpack": "5.111.1",
     "webpack-bundle-analyzer": "5.4.0",
